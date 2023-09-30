@@ -1,0 +1,9 @@
+const express= require( 'express')
+const app = express()
+var port = process.env.port || 8080
+app.use(express.static('static'))
+app.use(express.urlencoded({extended:false}))
+app.listen(port ,() =>
+console.log(`HTTP Server with Express.js is listening on port:${port}`))
+ 
+

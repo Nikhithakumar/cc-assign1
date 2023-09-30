@@ -1,0 +1,76 @@
+# This is an example Starter pipeline configuration
+# Use a skeleton to build, test and deploy using manual and parallel steps
+# -----
+# You can specify a custom docker image from Docker Hub as your build environment.
+
+image: atlassian/default-image:3
+
+pipelines:
+  pull-requests:
+    feature/*: # any branch with a prefix
+      - step:
+          name: 'Deployment to Staging'
+          deployment: 'staging'
+          services:
+            - docker
+          script:
+            - echo  "staging deployment script by kokilak2@udayton.edu"
+            - echo $HEROKU_API_KEY
+            - curl https://cli-assets.heroku.com/install-ubuntu.sh | sh
+            - heroku container:login
+            - heroku container:push web -a $STAGING_APP
+            - heroku container:release web -a $STAGING_APP
+            # push and publish the docker image
+  branches:
+    feature/*: # any branch with a feature prefix
+      - step:
+          name: 'Prepare for Deployment to Testing'
+          script:
+            - echo "Ready for testing deployment script by kokilak2@udayton.edu"
+      - step:
+          name: 'Deployment to Testing'
+          trigger: 'manual'
+          services:
+            - docker
+          script:
+            - echo  "staging deployment script by kokilak2@udayton.edu"
+            - echo $HEROKU_API_KEY
+            - curl https://cli-assets.heroku.com/install-ubuntu.sh | sh
+            - heroku container:login
+            - heroku container:push web -a $STAGING_APP
+            - heroku container:release web -a $STAGING_APP
+            # push and publish the docker image
+    staging: # this  will  run on every push of 'staging' branch
+      - step:
+          name: 'deployment to staging'
+          deployment: staging
+          services:
+            - docker
+          script:
+            - echo  "staging deployment script by kokilak2@udayton.edu"
+            - echo $HEROKU_API_KEY
+            - curl https://cli-assets.heroku.com/install-ubuntu.sh | sh
+            - heroku container:login
+            - heroku container:push web -a $STAGING_APP
+            - heroku container:release web -a $STAGING_APP
+            # push and publish the docker image
+    master: # this  will  run on every push of/merge to 'master' branch
+      - step:
+          name: 'Prepare for Deployment to Production'
+          script:
+            - echo "Ready for production deployment script by kokilak2@udayton.edu"
+      - step:
+          name: 'deployment to production'
+          deployment: production
+          trigger: 'manual'
+          services:
+            - docker
+          script:
+            - echo  "production deployment script by kokilak2@udayton.edu"
+            - echo $HEROKU_API_KEY
+            - curl https://cli-assets.heroku.com/install-ubuntu.sh | sh
+            - heroku container:login
+            - heroku container:push web -a $PRODUCTION_APP
+            - heroku container:release web -a $PRODUCTION_APP
+            # push and publish the docker image
+            
